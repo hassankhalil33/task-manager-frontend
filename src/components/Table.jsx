@@ -4,7 +4,7 @@ import editImage from "../assets/images/edit.png"
 import cancelImage from "../assets/images/cancel.png"
 
 function Table(props) {
-  const { headers, contents, addClass } = props;
+  const { headers, contents, addClass, editButton, deleteButton } = props;
 
   return (
     <div>
@@ -18,20 +18,20 @@ function Table(props) {
       {contents.map((content, index) => {
         return (
           <div key={index}>
-            <p>{index + 1}</p>
+            <p>{content.id}</p>
             {<p><img className="profile-image" src={defaultPic} alt="default" /></p>}
             <p>{content.email}</p>
             {content.userType && <p>{content.userType}</p>}
             {<p>
               <div
                 style={{ display: "inline-block" }}
-                onClick={() => alert("Edited!")}
+                onClick={() => editButton(content.id.toString())}
               >
                 <img className="edit-image" src={editImage} alt="default" />
               </div>
               <div
                 style={{ display: "inline-block" }}
-                onClick={() => alert("Deleted!")}
+                onClick={() => deleteButton(content.id.toString())}
               >
                 <img className="edit-image" src={cancelImage} alt="default" />
               </div>
