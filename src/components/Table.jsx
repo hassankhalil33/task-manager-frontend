@@ -4,7 +4,7 @@ import editImage from "../assets/images/edit.png"
 import cancelImage from "../assets/images/cancel.png"
 
 function Table(props) {
-  const { headers, contents, addClass, editButton, deleteButton } = props;
+  const { headers, contents, addClass, editButton, deleteButton, users } = props;
 
   return (
     <div>
@@ -19,9 +19,13 @@ function Table(props) {
         return (
           <div key={index}>
             <p>{content.id}</p>
-            {<p><img className="profile-image" src={defaultPic} alt="default" /></p>}
-            <p>{content.email}</p>
+            {users && <p><img className="profile-image" src={defaultPic} alt="default" /></p>}
+            {content.email && <p>{content.email}</p>}
             {content.userType && <p>{content.userType}</p>}
+            {content.title && <p>{content.title}</p>}
+            {!users && <p>{content.description}</p>}
+            {content.status && <p>{content.status}</p>}
+            {!users && <p>{content.assigneeId}</p>}
             {<p>
               <div
                 style={{ display: "inline-block" }}

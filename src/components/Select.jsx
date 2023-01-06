@@ -17,7 +17,12 @@ function Select(props) {
         <option value="SUPER_ADMIN">Super Admin</option>
       </select >
       :
-      <select required name="task" className="select-form">
+      <select required
+        name="task"
+        className="select-form"
+        value={value}
+        onChange={setValue}
+      >
         <option value="" disabled selected>Type</option>
         <option value="PENDING">Pending</option>
         <option value="IN_PROGRESS">In Progress</option>

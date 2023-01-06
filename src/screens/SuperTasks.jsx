@@ -8,31 +8,36 @@ import Input from "../components/Input";
 import Select from "../components/Select";
 import { Navigate } from "react-router-dom";
 
-function SuperUsers() {
+function SuperTasks() {
   const token = localStorage.getItem("token");
   const [refresh, setRefresh] = useState(false);
-  const [users, setUsers] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const [newIsOpen, setNewIsOpen] = useState(false);
   const [updateIsOpen, setUpdateIsOpen] = useState(false);
   const [id, setId] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [userType, setUserType] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [taskState, setTaskState] = useState("");
+  const [assigneeId, setAssigneeId] = useState("");
 
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
+  const handleTitleChange = (e) => {
+    setTitle(e.target.value);
   }
 
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
+  const handleDescriptionChange = (e) => {
+    setDescription(e.target.value);
   }
 
   const toggleNewPopup = () => {
     setNewIsOpen(!newIsOpen);
   }
 
-  const handleUserType = (e) => {
-    setUserType(e.target.value);
+  const handleTaskState = (e) => {
+    setTaskState(e.target.value);
+  }
+
+  const handleAssigneeId = (e) => {
+    setAssigneeId(e.target.value);
   }
 
   const toggleUpdatePopup = (thisId) => {
@@ -41,30 +46,41 @@ function SuperUsers() {
     setId(thisId);
   }
 
-  const getAllUsers = async () => {
+  const getAllTasks = async () => {
     try {
-      const response = await axios.get("/user", {
+      const response = await axios.get("/task", {
         headers: {
           Authorization: 'Bearer ' + token
         }
       });
       console.log(response.data);
 
-      await setUsers(response.data.allUsers);
+      await setTasks(response.data.allTasks);
 
     } catch (err) {
       console.log(err.response.data)
     }
   }
 
-  const createUser = async () => {
-    const newUser = {
-      email: email,
-      password: password
+  const createTask = async () => {
+    const newTask = {
+      title: title,
+      description: description,
+      assigneeId: assigneeId,
+    }
+
+    const headers = {
+      Authorization: 'Bearer ' + token
+    }
+
+    for (const key of Object.keys(newTask)) {
+      if (newTask[key] === "") {
+        delete newTask[key];
+      }
     }
 
     try {
-      const response = await axios.post("/auth/register", newUser);
+      const response = await axios.post("/task", newTask, { headers });
       console.log(response.data);
       setNewIsOpen(!newIsOpen);
       setRefresh(!refresh);
@@ -74,13 +90,16 @@ function SuperUsers() {
     }
   }
 
-  const updateUser = async () => {
+  const updateTask = async () => {
     const data = {
       id: id,
-      email: email,
-      password: password,
-      user_type: userType
+      title: title,
+      description: description,
+      assigneeId: assigneeId,
+      status: taskState
     }
+
+    console.log(data);
 
     for (const key of Object.keys(data)) {
       if (data[key] === "") {
@@ -88,14 +107,12 @@ function SuperUsers() {
       }
     }
 
-    console.log(data);
-
     const headers = {
       Authorization: 'Bearer ' + token
     }
 
     try {
-      const response = await axios.put("/user", data, { headers });
+      const response = await axios.put("/task", data, { headers });
       console.log(response.data);
       setUpdateIsOpen(!updateIsOpen);
       setRefresh(!refresh);
@@ -117,7 +134,7 @@ function SuperUsers() {
     }
 
     try {
-      const response = await axios.delete("/user", payload);
+      const response = await axios.delete("/task", payload);
       console.log(response.data);
       setRefresh(!refresh);
 
@@ -127,7 +144,7 @@ function SuperUsers() {
   }
 
   useEffect(() => {
-    getAllUsers();
+    getAllTasks();
   }, [refresh])
 
   if (!token) {
@@ -138,20 +155,19 @@ function SuperUsers() {
     <Super>
       <div className="admin-feed">
         <div>
-          <h1>All Users</h1>
+          <h1>All Tasks</h1>
         </div>
         <section className="admin-lower-feed">
           <div>
             <Button
               className={"admin-feed-button"}
-              content={"Add New User"}
+              content={"Add New Task"}
               click={toggleNewPopup}
             />
           </div>
           <Table
-            headers={["ID", "Photo", "Email", "Type", "Edit"]}
-            users={true}
-            contents={users}
+            headers={["ID", "Title", "Description", "Status", "AssigneeId", "Edit"]}
+            contents={tasks}
             editButton={toggleUpdatePopup}
             deleteButton={deleteUser}
           />
@@ -161,28 +177,35 @@ function SuperUsers() {
       {newIsOpen &&
         <Popup
           content={<>
-            <h2>Create New User</h2>
+            <h2>Create New Task</h2>
 
             <div>
               <Input
                 type={"text"}
-                value={email}
-                name={"email"}
-                placeholder={"Email"}
-                handleChange={handleEmailChange}
+                value={title}
+                name={"title"}
+                placeholder={"Title"}
+                handleChange={handleTitleChange}
               />
               <Input
-                type={"password"}
-                value={password}
-                name={"password"}
-                placeholder={"Password"}
-                handleChange={handlePasswordChange}
+                type={"text"}
+                value={description}
+                name={"description"}
+                placeholder={"Description"}
+                handleChange={handleDescriptionChange}
+              />
+              <Input
+                type={"text"}
+                value={assigneeId}
+                name={"AssigneeId"}
+                placeholder={"AssigneeId (Optional)"}
+                handleChange={handleAssigneeId}
               />
             </div>
 
             <Button
-              content={"Create User"}
-              click={createUser}
+              content={"Create Task"}
+              click={createTask}
             />
           </>}
           handleClose={toggleNewPopup}
@@ -192,33 +215,39 @@ function SuperUsers() {
       {updateIsOpen &&
         <Popup
           content={<>
-            <h2>Update User</h2>
+            <h2>Update Task</h2>
 
             <div>
               <Input
                 type={"text"}
-                value={email}
-                name={"email"}
-                placeholder={"Email"}
-                handleChange={handleEmailChange}
+                value={title}
+                name={"title"}
+                placeholder={"Title"}
+                handleChange={handleTitleChange}
               />
               <Input
-                type={"password"}
-                value={password}
-                name={"password"}
-                placeholder={"Password"}
-                handleChange={handlePasswordChange}
+                type={"text"}
+                value={description}
+                name={"description"}
+                placeholder={"Description"}
+                handleChange={handleDescriptionChange}
+              />
+              <Input
+                type={"text"}
+                value={assigneeId}
+                name={"AssigneeId"}
+                placeholder={"AssigneeId (Optional)"}
+                handleChange={handleAssigneeId}
               />
               <Select
-                user={true}
-                value={userType}
-                setValue={handleUserType}
+                value={taskState}
+                setValue={handleTaskState}
               />
             </div>
 
             <Button
-              content={"Update User"}
-              click={updateUser}
+              content={"Update Task"}
+              click={updateTask}
             />
           </>}
           handleClose={toggleUpdatePopup}
@@ -228,4 +257,4 @@ function SuperUsers() {
   )
 }
 
-export default SuperUsers;
+export default SuperTasks;
