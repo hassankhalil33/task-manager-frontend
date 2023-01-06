@@ -10,6 +10,7 @@ import { Navigate } from "react-router-dom";
 
 function SuperUsers() {
   const token = localStorage.getItem("token");
+  const [refresh, setRefresh] = useState(false);
   const [users, setUsers] = useState([]);
   const [newIsOpen, setNewIsOpen] = useState(false);
   const [updateIsOpen, setUpdateIsOpen] = useState(false);
@@ -28,6 +29,10 @@ function SuperUsers() {
 
   const toggleNewPopup = () => {
     setNewIsOpen(!newIsOpen);
+  }
+
+  const handleUserType = (e) => {
+    setUserType(e.target.value);
   }
 
   const toggleUpdatePopup = (thisId) => {
@@ -61,6 +66,8 @@ function SuperUsers() {
     try {
       const response = await axios.post("/auth/register", newUser);
       console.log(response.data);
+      setNewIsOpen(!newIsOpen);
+      setRefresh(!refresh);
 
     } catch (err) {
       console.log(err.response.data)
@@ -69,23 +76,30 @@ function SuperUsers() {
 
   const updateUser = async () => {
     console.log(id);
+    const data = {
+      id: id,
+      email: email,
+      password: password,
+      user_type: userType
+    }
 
-    const payload = {
-      data: {
-        id: id,
-        email: email,
-        password: password,
-        user_type: userType
-      },
-
-      headers: {
-        Authorization: 'Bearer ' + token
+    for (const key of Object.keys(data)) {
+      if (data[key] === "") {
+        delete data[key];
       }
     }
 
+    console.log(data);
+
+    const headers = {
+      Authorization: 'Bearer ' + token
+    }
+
     try {
-      const response = await axios.put("/user", payload);
+      const response = await axios.put("/user", data, { headers });
       console.log(response.data);
+      setUpdateIsOpen(!updateIsOpen);
+      setRefresh(!refresh);
 
     } catch (err) {
       console.log(err.response.data)
@@ -106,6 +120,7 @@ function SuperUsers() {
     try {
       const response = await axios.delete("/user", payload);
       console.log(response.data);
+      setRefresh(!refresh);
 
     } catch (err) {
       console.log(err.response.data)
@@ -114,7 +129,7 @@ function SuperUsers() {
 
   useEffect(() => {
     getAllUsers();
-  }, [])
+  }, [refresh])
 
   if (!token) {
     return <Navigate to="/" />
@@ -196,11 +211,13 @@ function SuperUsers() {
               />
               <Select
                 user={true}
+                value={userType}
+                setValue={handleUserType}
               />
             </div>
 
             <Button
-              content={"Create User"}
+              content={"Update User"}
               click={updateUser}
             />
           </>}

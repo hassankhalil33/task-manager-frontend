@@ -1,12 +1,17 @@
 import React from "react";
 
 function Select(props) {
-  const { user } = props;
+  const { user, value, setValue } = props;
 
   return (
     user ?
-      <select required name="usertype" className="select-form">
-        < option value="" disabled selected > Type</option >
+      <select required
+        name="usertype"
+        className="select-form"
+        value={value}
+        onChange={setValue}
+      >
+        <option value="" disabled selected > Type</option>
         <option value="NORMAL">Normal</option>
         <option value="ADMIN">Admin</option>
         <option value="SUPER_ADMIN">Super Admin</option>
