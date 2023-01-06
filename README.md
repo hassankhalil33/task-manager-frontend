@@ -9,9 +9,12 @@ In the project directory, you can run:
 ### `npm install`
 ### `npm start`
 
-This is a Simple UI for Super Admins to Test Out the Main Project https://github.com/hassankhalil33/task-manager-backend
+
+
+This is a Simple UI done in REACT for Super Admins to Test Out the Main Project https://github.com/hassankhalil33/task-manager-backend
 
 SuperAdmin Credentials:
 
 email: Hassan@gmail.com
+
 password: Hassan33
