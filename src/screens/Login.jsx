@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import axios from "../api/axios";
@@ -6,6 +7,7 @@ import axios from "../api/axios";
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -27,9 +29,11 @@ function Login() {
       const response = await axios.post("/auth/login", data);
       console.log(response.data);
 
-      localStorage.setItem("token", response.data.token)
+      await localStorage.setItem("token", response.data.token);
+      navigate("/super");
     } catch (err) {
       console.log(err.response.data)
+      alert("Try: Hassan@gmail.com : Hassan33");
     }
   }
 

@@ -27,6 +27,7 @@ function SideBar(props) {
         content={"Log Out"}
         icon={logout}
         url={"/"}
+        logout={true}
       />
     </div>
   )
